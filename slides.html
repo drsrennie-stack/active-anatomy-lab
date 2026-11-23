@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Active Recall Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#060B1A;--maroon:#7A2A22;--maroon-d:#5E1F19;--gold:#B8924A;--page:#FAFAF9;--ink:#1E2A44;--line:#C9CED6;--track:#D9DCE2}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--page);color:var(--navy);font-family:'DM Sans',Arial,sans-serif;font-style:normal;display:flex;flex-direction:column;min-height:100vh}
+em,i{font-style:normal}
+.skip{position:absolute;left:-999px;top:0;background:var(--navy);color:#fff;padding:12px 16px;z-index:20}
+.skip:focus{left:8px;top:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+main{flex:1;display:flex}
+.slide{flex:1;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:4vw;align-items:center;padding:6vh 6vw 4vh;background:var(--page)}
+.slide.notimer{grid-template-columns:minmax(0,1fr)}
+.slide.dark{background:var(--navy);color:#fff}
+.eyebrow{margin:0;font-size:clamp(13px,1.3vw,22px);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--maroon)}
+.dark .eyebrow{color:#D9B66A}
+h1{margin:.3em 0 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:clamp(32px,5.2vw,88px);line-height:1.06;letter-spacing:-.02em;outline:none}
+.hl{color:var(--maroon)}
+.dark .hl{color:#fff}
+ul.points{margin:1.1em 0 0;padding-left:1.1em;font-size:clamp(18px,2.3vw,38px);line-height:1.35;color:var(--ink)}
+.dark ul.points{color:#D5DAE6}
+ul.points li{margin-top:.35em}
+.lede{font-size:clamp(18px,2.4vw,40px);color:#D5DAE6;margin:1em 0 0}
+.byline{margin-top:1.6em;font-size:clamp(13px,1.4vw,24px);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#D9B66A}
+.notes{margin-top:1.4em;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:clamp(15px,1.3vw,20px);max-width:70ch}
+.notes strong{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--maroon);margin-bottom:4px}
+.clock{display:flex;flex-direction:column;align-items:center;gap:2.2vh}
+.dial{position:relative;width:min(34vw,52vh);aspect-ratio:1}
+.dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--track);stroke-width:14}
+.ring{fill:none;stroke:var(--gold);stroke-width:14;stroke-linecap:round}
+.dial.running .ring{stroke:var(--navy)}
+.dial.last .ring{stroke:var(--maroon)}
+.dial.done .ring-bg{stroke:var(--maroon)}
+.readout{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.time{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:clamp(40px,8vw,130px);line-height:1;font-variant-numeric:tabular-nums;color:var(--navy)}
+.dial.last .time,.dial.done .time{color:var(--maroon)}
+.state{margin-top:.6em;font-size:clamp(12px,1.2vw,20px);font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
+.dial.done .state{color:var(--maroon)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+button{font:inherit;font-size:clamp(13px,1.1vw,17px);font-weight:700;letter-spacing:.14em;text-transform:uppercase;min-height:48px;min-width:48px;padding:12px 22px;border-radius:8px;border:2px solid transparent;cursor:pointer;color:#fff}
+.b-navy{background:var(--navy);border-color:var(--navy)}
+.b-navy:hover{background:#141C33}
+.b-maroon{background:var(--maroon);border-color:var(--maroon)}
+.b-maroon:hover{background:var(--maroon-d)}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+footer :focus-visible,.dark :focus-visible{outline-color:#fff}
+footer{background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 3vw;flex-wrap:wrap}
+footer .b-navy{border-color:#8A93A8}
+.count{font-weight:700;letter-spacing:.14em;font-size:14px;text-transform:uppercase;margin:0 auto 0 8px}
+.keys{font-size:14px;color:#D5DAE6}
+@media (max-width:800px){.slide{grid-template-columns:1fr;align-items:start;padding:4vh 6vw}.dial{width:min(60vw,36vh)}.keys{display:none}}
+@media (prefers-reduced-motion:no-preference){.ring{transition:stroke .4s ease}button{transition:background-color .15s ease}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the slide</a>
+<main id="main"><section class="slide" id="slide" aria-live="off"></section></main>
+<div class="sr" id="announce" role="status" aria-live="polite"></div>
+<footer>
+  <button class="b-navy" id="prev" type="button">Back</button>
+  <button class="b-maroon" id="next" type="button">Next</button>
+  <p class="count" id="count"></p>
+  <span class="keys">Arrow keys change slides. Space starts or pauses the timer. N shows notes.</span>
+  <button class="b-navy" id="notesBtn" type="button" aria-pressed="false">Notes</button>
+  <button class="b-navy" id="full" type="button">Full screen</button>
+</footer>
+
+<script>
+(function(){
+  var S=[];
+  function add(o){S.push(o);}
+  add({dark:1,eyebrow:'Lab active recall',head:'3 sets. 10 structures each.',lede:'25 minutes per set. 1 point per set.',byline:'Dr. Sharilyn Rennie',notes:'10 min open, three 25 min loops, 5 min wrap.'});
+  add({eyebrow:'Before we start',head:'Each <span class="hl">table</span> needs',pts:['Printed atlas. Closed until step 7.','Blank paper and a pen per person.','Key: handed out after I see your lists.','Roles: reader, pointer, key holder. Rotate.'],notes:'Optional entry check: five structures, two minutes, low or no points.'});
+  add({eyebrow:'Points',head:'Table <span class="hl">check</span>',pts:['Bring both lists.','I pick one person. That person names 3 structures.','Pass: 1 point.','Miss: 2 more minutes, then I pick again.','Pass this set before I check the next.','3 sets, 3 points.'],notes:'Look at the second lists first. Show the two structures that get confused on the practical. Early finishers: mixed review.'});
+  add({eyebrow:'Rules',head:'You do the <span class="hl">recalling</span>',pts:['I teach each set once.','No answers from me during the steps.','Show me your lists to get the key.','Need the list from me: no point for that set.','You still pass that set before the next check.'],notes:'Bar is the table’s combined memory. Table cannot rebuild the list: they ask, lose the point, still pass before moving on.'});
+  [1,2,3].forEach(function(n){
+    var e=function(k){return 'Set '+n+' · step '+k+' of 7';};
+    if(n>1)add({dark:1,eyebrow:'Set '+n,head:'Name 3 structures from set '+(n-1),pts:['No list. No atlas. No model.','Out loud at your table.'],notes:'Untimed. Under a minute.'});
+    add({eyebrow:e(1),head:'Watch and <span class="hl">listen</span>',pts:['Hands empty.','I point to 10 structures and name them.','You write them from memory next.'],min:5,notes:'Teach, 5 min.'});
+    add({eyebrow:e(2),head:'List from <span class="hl">memory</span>',pts:['Alone. No talking.','Write every structure you can recall. Do not stop at 10.','Memorize the ones you recall.','No points for this list.'],min:2,notes:'First list, 2 min alone.'});
+    add({eyebrow:e(3),head:'<span class="hl">Compare</span> lists',pts:['Rebuild the full list as a table. From memory.','Show me the lists. Get the key.','Need the list from me: no point for this set.'],min:2,notes:'Key goes to tables with the full list. Table needs the list from you: no point, still must pass before next set.'});
+    add({eyebrow:e(4),head:'Flip and <span class="hl">rewrite</span>',pts:['Full list. From memory. Alone.','This list is your ticket to the table check.'],min:2,notes:'Second list, 2 min.'});
+    add({eyebrow:e(5),head:'Hear the name, <span class="hl">point</span> to it',pts:['Reader says a name. Random order.','Next person points. Reader checks the key.','Pass the list after each structure.','Check-offs open at the front.'],min:5,notes:'Round table, name to structure. Check-offs run through step 7.'});
+    add({eyebrow:e(6),head:'Point to it, say the <span class="hl">name</span>',pts:['One person points.','Next person names it. Key holder checks.','Check-offs open at the front.'],min:5,notes:'Round table, structure to name.'});
+    add({eyebrow:e(7),head:'Fix your <span class="hl">misses</span>',pts:['Open the atlas. Mark what you missed.','Rework those with a partner.','Last call for this set’s check-off.'],min:4,notes:'Fix the misses, 4 min.'});
+  });
+  add({eyebrow:'Wrap up',head:'Before you <span class="hl">leave</span>',pts:['Finish open check-offs.','Confirm your points with me.','Done early: mixed review of all 3 sets.'],min:5,notes:'Wrap up, 5 min.'});
+
+  var i=0,showNotes=false,C=2*Math.PI*90;
+  var T={total:0,left:0,running:false,end:0,raf:0,lastMin:-1};
+  var slide=document.getElementById('slide'),ann=document.getElementById('announce'),audio=null;
+  function $(id){return document.getElementById(id);}
+  function fmt(s){s=Math.ceil(s);var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x;}
+
+  function render(focus){
+    cancelAnimationFrame(T.raf);T.running=false;
+    var d=S[i],h='<div class="copy"><p class="eyebrow">'+d.eyebrow+'</p><h1 id="h" tabindex="-1">'+d.head+'</h1>';
+    if(d.lede)h+='<p class="lede">'+d.lede+'</p>';
+    if(d.pts)h+='<ul class="points">'+d.pts.map(function(p){return '<li>'+p+'</li>';}).join('')+'</ul>';
+    if(d.byline)h+='<p class="byline">'+d.byline+'</p>';
+    if(showNotes&&d.notes)h+='<div class="notes"><strong>Instructor notes</strong>'+d.notes+'</div>';
+    h+='</div>';
+    if(d.min){
+      h+='<div class="clock"><div class="dial" id="dial"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring" id="ring" cx="100" cy="100" r="90" stroke-dasharray="'+C+'" stroke-dashoffset="0"/></svg>'+
+         '<div class="readout"><div class="time" id="time" aria-hidden="true"></div><div class="state" id="state"></div></div></div>'+
+         '<div class="btns"><button class="b-navy" id="go" type="button">Start</button><button class="b-maroon" id="reset" type="button">Reset</button></div></div>';
+    }
+    slide.className='slide'+(d.dark?' dark':'')+(d.min?'':' notimer');
+    slide.innerHTML=h;
+    $('count').textContent='Slide '+(i+1)+' of '+S.length;
+    $('prev').disabled=i===0;$('next').disabled=i===S.length-1;
+    if(d.min){T.total=d.min*60;T.left=T.total;T.lastMin=-1;$('go').addEventListener('click',toggle);$('reset').addEventListener('click',reset);paint();}
+    else{T.total=0;}
+    if(focus)$('h').focus();
+    sendHeight();
+  }
+  function paint(){
+    var dial=$('dial');if(!dial)return;
+    var done=T.left<=0;
+    $('ring').setAttribute('stroke-dashoffset',String(C*(1-Math.max(T.left,0)/T.total)));
+    $('time').textContent=done?'0:00':fmt(T.left);
+    dial.className='dial'+(T.running?' running':'')+(!done&&T.left<=30?' last':'')+(done?' done':'');
+    $('state').textContent=done?'Time is up':T.running?'Running':(T.left<T.total?'Paused':T.total/60+' minutes');
+    $('go').textContent=T.running?'Pause':(T.left<T.total&&!done?'Resume':'Start');
+    $('go').disabled=done;
+  }
+  function tick(){
+    if(!T.running)return;
+    T.left=(T.end-performance.now())/1000;
+    var m=Math.ceil(T.left/60);
+    if(T.left>0&&m!==T.lastMin){if(T.lastMin!==-1)ann.textContent=m+(m===1?' minute left':' minutes left');T.lastMin=m;}
+    if(T.left<=0){T.left=0;T.running=false;paint();ann.textContent='Time is up';chime();return;}
+    paint();T.raf=requestAnimationFrame(tick);
+  }
+  function toggle(){
+    if(!T.total||T.left<=0)return;
+    if(T.running){T.running=false;cancelAnimationFrame(T.raf);ann.textContent='Timer paused';paint();}
+    else{try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();}catch(e){}
+      T.running=true;T.end=performance.now()+T.left*1000;ann.textContent='Timer started';paint();T.raf=requestAnimationFrame(tick);}
+  }
+  function reset(){if(!T.total)return;cancelAnimationFrame(T.raf);T.running=false;T.left=T.total;T.lastMin=-1;ann.textContent='Timer reset';paint();}
+  function chime(){
+    try{if(!audio)return;[0,0.45,0.9].forEach(function(t){var o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=880;
+      g.gain.setValueAtTime(0.0001,audio.currentTime+t);g.gain.exponentialRampToValueAtTime(0.4,audio.currentTime+t+0.03);g.gain.exponentialRampToValueAtTime(0.0001,audio.currentTime+t+0.35);
+      o.connect(g);g.connect(audio.destination);o.start(audio.currentTime+t);o.stop(audio.currentTime+t+0.4);});}catch(e){}
+  }
+  function go(n,focus){if(n<0||n>=S.length)return;i=n;render(focus);}
+  $('prev').addEventListener('click',function(){go(i-1,true);});
+  $('next').addEventListener('click',function(){go(i+1,true);});
+  $('notesBtn').addEventListener('click',function(){showNotes=!showNotes;this.setAttribute('aria-pressed',showNotes?'true':'false');var l=T.left,r=T.running,e=T.end;render(false);if(S[i].min){T.left=l;if(r){T.running=true;T.end=e;T.raf=requestAnimationFrame(tick);}paint();}});
+  $('full').addEventListener('click',function(){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}catch(e){}});
+  document.addEventListener('keydown',function(ev){
+    var tag=ev.target.tagName;
+    if(ev.key==='ArrowRight'||ev.key==='PageDown'){ev.preventDefault();go(i+1,true);}
+    else if(ev.key==='ArrowLeft'||ev.key==='PageUp'){ev.preventDefault();go(i-1,true);}
+    else if(ev.key===' '&&tag!=='BUTTON'){ev.preventDefault();toggle();}
+    else if((ev.key==='n'||ev.key==='N')&&tag!=='INPUT'){$('notesBtn').click();}
+  });
+  function sendHeight(){try{window.parent.postMessage({id:'lab-recall-slides',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
+  window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);
+  if(window.ResizeObserver){new ResizeObserver(sendHeight).observe(document.body);}
+  render(false);
+})();
+</script>
+</body>
+</html>

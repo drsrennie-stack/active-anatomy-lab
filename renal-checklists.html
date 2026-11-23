@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renal Structure Checklists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#060B1A;--navy2:#1E3D4C;--tint:#EDF1F3;--maroon:#7A2A22;--maroon-d:#5E1F19;--page:#FAFAF9;--line:#C9CED6;--muted:#3B4558}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--navy);font-family:'DM Sans',Arial,sans-serif;font-style:normal;font-size:18px;line-height:1.4}
+.skip{position:absolute;left:-999px;top:0;background:var(--navy);color:#fff;padding:12px 16px;z-index:10}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:3px solid var(--maroon);outline-offset:3px}
+header :focus-visible{outline-color:#fff}
+header{background:var(--navy);color:#fff;padding:26px 20px 22px}
+.wrap{max-width:860px;margin:0 auto}
+.eyebrow{margin:0;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#D9B66A}
+h1{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:clamp(28px,5vw,42px);line-height:1.1;margin:8px 0 0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.tab{font:inherit;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid #8A93A8;background:transparent;color:#fff;cursor:pointer}
+.tab[aria-selected="true"]{background:#fff;color:var(--navy);border-color:#fff}
+main{padding:22px 20px 40px}
+h2{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:26px;margin:0}
+.how{margin:6px 0 0;color:var(--muted)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:16px 0}
+.count{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:20px;color:var(--maroon);margin-right:auto}
+.btn{font:inherit;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;min-height:44px;padding:10px 18px;border-radius:8px;border:2px solid transparent;color:#fff;cursor:pointer}
+.b-navy{background:var(--navy)}
+.b-maroon{background:var(--maroon)}
+.b-maroon:hover{background:var(--maroon-d)}
+ol{list-style:none;margin:0;padding:0;counter-reset:n}
+li{counter-increment:n;margin-bottom:8px}
+li label{display:flex;align-items:center;gap:14px;min-height:52px;padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer}
+li label::before{content:counter(n);font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;color:var(--maroon);min-width:1.6em}
+li input{width:24px;height:24px;accent-color:var(--navy2);flex:none}
+li input:checked + span{font-weight:700}
+li.done label{background:var(--tint);border:2px solid var(--navy2)}
+.group{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--maroon);margin:18px 0 8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media print{
+  header{background:#fff;color:#000;padding:0 0 8px}.eyebrow{color:#000}.tabs,.top .btn,.skip{display:none}
+  body{background:#fff;color:#000;font-size:12pt}
+  .panel{display:block !important;break-inside:avoid;margin-bottom:18px}
+  li label{border:0;box-shadow:none;background:#fff !important;min-height:0;padding:3px 0}
+  li.done label{border:0}li label::before,.count,.group{color:#000}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the checklist</a>
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Renal lab</p>
+    <h1>Renal Structure Checklists</h1>
+    <div class="tabs" role="tablist" aria-label="Structure list" id="tabs"></div>
+  </div>
+</header>
+<main id="main" class="wrap" tabindex="-1"></main>
+<div class="sr" id="live" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var LISTS=[
+    {tab:'1 Blood flow',title:'List 1: Blood flow',how:'Name these in blood flow order.',groups:[[null,['Renal artery','Segmental artery','Interlobar artery','Arcuate artery','Cortical radiate artery','Afferent arteriole','Glomerulus','Efferent arteriole','Peritubular capillaries','Vasa recta','Cortical radiate vein','Arcuate vein','Interlobar vein','Renal vein']]]},
+    {tab:'2 Nephron',title:'List 2: Nephron',how:'Name these in the order fluid moves through the nephron.',groups:[[null,['Glomerulus','Glomerular (Bowman’s) capsule, visceral layer (podocytes)','Capsular space','Glomerular (Bowman’s) capsule, parietal layer','Proximal convoluted tubule','Nephron loop (loop of Henle), descending limb','Hairpin turn of the nephron loop','Nephron loop (loop of Henle), ascending limb','Distal convoluted tubule','Collecting duct']]]},
+    {tab:'3 Kidney',title:'List 3: Kidney, outside to ureter',how:'Name these from the outside of the kidney inward, then follow the path urine takes out.',groups:[[null,['Renal capsule','Renal hilum','Renal cortex','Renal medulla','Renal pyramid','Renal column','Renal papilla','Renal sinus','Minor calyx','Major calyx','Renal pelvis','Ureter']]]},
+    {tab:'4 Glomerulus and bladder',title:'List 4: Glomerulus model and bladder plaque',how:'',groups:[['Glomerulus model',['Afferent arteriole','Glomerular capillaries','Efferent arteriole','Podocytes (visceral layer)','Capsular space','Parietal layer of the glomerular capsule','Macula densa','Juxtaglomerular (granular) cells']],['Bladder plaque',['Ureter','Ureteral orifices','Trigone','Detrusor muscle','Rugae','Internal urethral orifice','Urethra']]]}
+  ];
+  var KEY='renal-checklists-v1',state={active:0,done:{}};
+  try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);if(p&&p.done)state=p;}}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  var tabs=document.getElementById('tabs'),main=document.getElementById('main'),live=document.getElementById('live');
+
+  LISTS.forEach(function(L,li){
+    var b=el('button','tab',L.tab);b.type='button';b.id='tab-'+li;b.setAttribute('role','tab');b.setAttribute('aria-controls','panel-'+li);
+    b.addEventListener('click',function(){show(li);});
+    b.addEventListener('keydown',function(ev){var d=ev.key==='ArrowRight'?1:ev.key==='ArrowLeft'?-1:0;if(!d)return;ev.preventDefault();var n=(li+d+LISTS.length)%LISTS.length;show(n);document.getElementById('tab-'+n).focus();});
+    tabs.appendChild(b);
+
+    var panel=el('section','panel');panel.id='panel-'+li;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','tab-'+li);
+    panel.appendChild(el('h2',null,L.title));
+    if(L.how)panel.appendChild(el('p','how',L.how));
+    var top=el('div','top'),count=el('div','count');top.appendChild(count);
+    var all=el('button','btn b-navy','Check all');all.type='button';
+    var clr=el('button','btn b-maroon','Clear list');clr.type='button';
+    top.appendChild(all);top.appendChild(clr);panel.appendChild(top);
+    var boxes=[],total=0,k=0;
+    L.groups.forEach(function(G){
+      if(G[0])panel.appendChild(el('p','group',G[0]));
+      var ol=el('ol');if(k)ol.style.counterReset='n '+k;
+      G[1].forEach(function(name){
+        var id='c'+li+'-'+k,item=el('li'),lab=el('label'),cb=el('input');
+        cb.type='checkbox';cb.id=id;cb.checked=!!state.done[id];lab.setAttribute('for',id);
+        if(cb.checked)item.className='done';
+        cb.addEventListener('change',function(){if(cb.checked)state.done[id]=1;else delete state.done[id];item.className=cb.checked?'done':'';save();upd(true);});
+        lab.appendChild(cb);lab.appendChild(el('span',null,name));item.appendChild(lab);ol.appendChild(item);
+        boxes.push([cb,item,id]);k++;total++;
+      });
+      panel.appendChild(ol);
+    });
+    function upd(say){var n=boxes.filter(function(x){return x[0].checked;}).length;count.textContent=n+' of '+total+' checked';if(say)live.textContent=L.title+': '+n+' of '+total+' checked';send();}
+    function setAll(v){boxes.forEach(function(x){x[0].checked=v;x[1].className=v?'done':'';if(v)state.done[x[2]]=1;else delete state.done[x[2]];});save();upd(true);}
+    all.addEventListener('click',function(){setAll(true);});clr.addEventListener('click',function(){setAll(false);});
+    upd(false);main.appendChild(panel);
+  });
+
+  function show(n){
+    state.active=n;save();
+    LISTS.forEach(function(_,li){var on=li===n,t=document.getElementById('tab-'+li);t.setAttribute('aria-selected',on?'true':'false');t.tabIndex=on?0:-1;document.getElementById('panel-'+li).style.display=on?'block':'none';});
+    send();
+  }
+  function send(){try{window.parent.postMessage({id:'renal-checklists',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
+  window.addEventListener('load',send);window.addEventListener('resize',send);
+  if(window.ResizeObserver){new ResizeObserver(send).observe(document.body);}
+  show(state.active<LISTS.length?state.active:0);
+})();
+</script>
+</body>
+</html>

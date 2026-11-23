@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Active Anatomy Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAFAF9;color:#060B1A;font-family:'DM Sans',Arial,sans-serif;font-style:normal;font-size:18px;line-height:1.45}
+.skip{position:absolute;left:-999px;top:0;background:#060B1A;color:#fff;padding:12px 16px}
+.skip:focus{left:8px;top:8px}
+header{background:#060B1A;color:#fff;padding:40px 20px}
+.wrap{max-width:900px;margin:0 auto}
+.eyebrow{margin:0;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#D9B66A}
+h1{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:clamp(32px,6vw,56px);line-height:1.05;margin:10px 0 0}
+main{padding:28px 20px 48px}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+li{background:#fff;border:1px solid #C9CED6;border-radius:12px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+.n{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:44px;color:#7A2A22;line-height:1}
+h2{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:22px;margin:0}
+p{margin:4px 0 0;color:#3B4558}
+a.btn{display:inline-block;min-height:44px;padding:12px 20px;border-radius:8px;background:#7A2A22;color:#fff;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+a.btn:hover{background:#5E1F19}
+a.btn:focus-visible{outline:3px solid #060B1A;outline-offset:3px}
+@media (max-width:600px){li{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the links</a>
+<header><div class="wrap"><p class="eyebrow">Dr. Sharilyn Rennie</p><h1>Active Anatomy Lab</h1></div></header>
+<main id="main" class="wrap">
+<ul>
+<li><span class="n" aria-hidden="true">01</span><div><h2>Walkthrough slides</h2><p>Lab steps with a timer on each one.</p></div><a class="btn" href="slides.html" target="_top">Open slides</a></li>
+<li><span class="n" aria-hidden="true">02</span><div><h2>Score sheet</h2><p>Table check-offs and points for each class.</p></div><a class="btn" href="score-sheet.html" target="_top">Open score sheet</a></li>
+<li><span class="n" aria-hidden="true">03</span><div><h2>Renal structure checklists</h2><p>The four renal lists with check boxes.</p></div><a class="btn" href="renal-checklists.html" target="_top">Open checklists</a></li>
+</ul>
+</main>
+<script>
+(function(){function s(){try{window.parent.postMessage({id:'active-anatomy-lab',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
+window.addEventListener('load',s);window.addEventListener('resize',s);if(window.ResizeObserver){new ResizeObserver(s).observe(document.body);}})();
+</script>
+</body>
+</html>
