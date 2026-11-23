@@ -101,6 +101,25 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
 .seat{gap:5px;margin-top:2px;font-size:12px}.seat input{width:50px}.seat output{font-size:14px;min-width:5ch}
 .note{margin-top:6px}.gate{font-size:11px;margin-bottom:3px}
 .panel{padding:12px;margin-top:10px}
+.lrow{margin-bottom:4px}.lstat{font-size:11.5px;font-weight:700;color:var(--muted)}
+.lstat.ok{color:var(--navy2)}.lstat.no{color:var(--maroon)}
+.lpanel{border-top:1px solid var(--line);margin:4px 0 6px;padding-top:4px}
+.lhint{margin:0 0 2px;font-size:11px;font-weight:700;color:var(--maroon)}
+label.miss{display:flex;align-items:center;gap:6px;min-height:26px;font-size:12.5px;line-height:1.15}
+label.miss input{width:17px;height:17px;flex:none;accent-color:var(--maroon)}
+.lpanel .btn{margin-top:6px}
+#missed ul{margin:0;padding-left:1.2em}#missed p{margin:0}
+dialog{border:1px solid var(--line);border-radius:14px;padding:22px;width:min(520px,94vw);color:var(--navy);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(6,11,26,.6)}
+.wctl{display:flex;align-items:center;gap:10px;margin:10px 0;font-weight:700}
+.wctl select{width:90px}
+.wheelbox{position:relative;width:min(340px,70vw);margin:8px auto 0}
+.wheelbox svg{display:block;width:100%}
+.pointer{position:absolute;left:50%;top:-4px;margin-left:-14px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--gold);z-index:1}
+#wheelG{transform-origin:0 0}
+.wres{text-align:center;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:30px;color:var(--maroon);margin:10px 0 14px;min-height:1.3em}
+.btn.big{min-height:46px;padding:10px 26px;font-size:14px;letter-spacing:.14em}
+@media (prefers-reduced-motion:no-preference){#wheelG.spinning{transition:transform 3.2s cubic-bezier(.17,.67,.2,1)}}
 </style>
 </head>
 <body>
@@ -122,19 +141,25 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
       <div class="field"><label for="ntables">Tables in this class</label><select id="ntables"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
       <div class="field"><label for="nsets">Sets today</label><select id="nsets"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
       <div class="field"><label for="topic">Lab topic</label><input type="text" id="topic" autocomplete="off"></div>
-      <div class="field"><label for="set0">Set 1 covers</label><input type="text" id="set0" autocomplete="off"></div>
-      <div class="field"><label for="set1">Set 2 covers</label><input type="text" id="set1" autocomplete="off"></div>
-      <div class="field"><label for="set2">Set 3 covers</label><input type="text" id="set2" autocomplete="off"></div>
-      <div class="field"><label for="set3">Set 4 covers</label><input type="text" id="set3" autocomplete="off"></div>
+      <div class="field"><label for="set0">Set 1 list</label><select id="set0"></select></div>
+      <div class="field"><label for="set1">Set 2 list</label><select id="set1"></select></div>
+      <div class="field"><label for="set2">Set 3 list</label><select id="set2"></select></div>
+      <div class="field"><label for="set3">Set 4 list</label><select id="set3"></select></div>
     </div>
 
     </details>
 
     <div class="tools">
+      <button class="btn primary" id="wheelOpen" type="button">Number wheel</button>
       <div class="total" id="total" aria-live="polite"></div>
     </div>
 
     <div class="grid" id="grid"></div>
+
+    <section class="panel" aria-labelledby="mH">
+      <h2 id="mH">Most missed on the lists</h2>
+      <div class="lists" id="missed" aria-live="polite"></div>
+    </section>
 
     <details class="panel" id="lists">
       <summary><span class="sumtxt">Renal structure lists (your key)</span></summary>
@@ -169,16 +194,36 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
   </div>
 </main>
 
+<dialog id="wheelDlg" aria-labelledby="wheelH">
+  <h2 id="wheelH">Number wheel</h2>
+  <div class="wctl">
+    <label for="wheelN">Students at the table</label>
+    <select id="wheelN"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+  </div>
+  <div class="wheelbox"><div class="pointer" aria-hidden="true"></div><svg id="wheel" viewBox="-110 -110 220 220" aria-hidden="true" focusable="false"><g id="wheelG"></g></svg></div>
+  <p class="wres" id="wheelRes" role="status" aria-live="polite">Count off, then spin.</p>
+  <div class="row" style="justify-content:center">
+    <button class="btn primary big" id="spin" type="button">Spin</button>
+    <button class="btn maroon big" id="wheelClose" type="button">Close</button>
+  </div>
+</dialog>
+
 <script>
 (function(){
-  var GROUPS=['Monday','Tue AM','Tue PM'], KEY='lab-checkoff-v3', MAXSETS=4;
+  var GROUPS=['Monday','Tue AM','Tue PM'], KEY='lab-checkoff-v4', MAXSETS=4;
   function today(){var d=new Date(),m=d.getMonth()+1,n=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(n<10?'0':'')+n;}
-  function blankTable(){var s=[];for(var i=0;i<MAXSETS;i++)s.push({lists:false,tries:0,passed:false,needed:false});return {sets:s,note:'',seats:4,seat:''};}
-  function blankGroup(){var t=[];for(var i=0;i<6;i++)t.push(blankTable());return {date:today(),topic:'',names:['','','',''],tables:t,count:6,nsets:3};}
+  function blankTable(){var s=[];for(var i=0;i<MAXSETS;i++)s.push({tries:0,passed:false,needed:false,missed:{},ever:{},listPassed:false,listTries:0});return {sets:s,note:'',seats:4,seat:''};}
+  function blankGroup(){var t=[];for(var i=0;i<6;i++)t.push(blankTable());return {date:today(),topic:'',names:[0,1,2,3],tables:t,count:6,nsets:3};}
+  var LISTS=[
+    {t:'Blood flow',s:['Renal artery','Segmental artery','Interlobar artery','Arcuate artery','Cortical radiate artery','Afferent arteriole','Glomerulus','Efferent arteriole','Peritubular capillaries','Vasa recta','Cortical radiate vein','Arcuate vein','Interlobar vein','Renal vein']},
+    {t:'Nephron',s:['Glomerulus','Capsule, visceral layer (podocytes)','Capsular space','Capsule, parietal layer','Proximal convoluted tubule','Nephron loop, descending limb','Hairpin turn','Nephron loop, ascending limb','Distal convoluted tubule','Collecting duct']},
+    {t:'Kidney',s:['Renal capsule','Renal hilum','Renal cortex','Renal medulla','Renal pyramid','Renal column','Renal papilla','Renal sinus','Minor calyx','Major calyx','Renal pelvis','Ureter']},
+    {t:'Glomerulus and bladder',s:['Afferent arteriole','Glomerular capillaries','Efferent arteriole','Podocytes (visceral layer)','Capsular space','Parietal layer of capsule','Macula densa','Juxtaglomerular cells','Ureter','Ureteral orifices','Trigone','Detrusor muscle','Rugae','Internal urethral orifice','Urethra']}
+  ];
   var state={active:0,groups:[blankGroup(),blankGroup(),blankGroup()]};
   try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.groups&&p.groups.length===3)state=p;}}catch(e){}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
-  function g(){var x=state.groups[state.active];if(!x.count)x.count=x.tables.length||6;if(!x.nsets)x.nsets=3;while(x.names.length<MAXSETS)x.names.push('');while(x.tables.length<x.count)x.tables.push(blankTable());return x;}
+  function g(){var x=state.groups[state.active];if(!x.count)x.count=x.tables.length||6;if(!x.nsets)x.nsets=3;for(var q=0;q<MAXSETS;q++)if(typeof x.names[q]!=='number'||!LISTS[x.names[q]])x.names[q]=q;while(x.tables.length<x.count)x.tables.push(blankTable());return x;}
   function shown(){var x=g();return x.tables.slice(0,x.count);}
   function $(id){return document.getElementById(id);}
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
@@ -199,49 +244,80 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
   function bind(id,get,set){var n=$(id);n.addEventListener('input',function(){set(n.value);save();});n._get=get;}
   bind('date',function(){return g().date;},function(v){g().date=v;});
   bind('topic',function(){return g().topic;},function(v){g().topic=v;});
-  [0,1,2,3].forEach(function(i){bind('set'+i,function(){return g().names[i];},function(v){g().names[i]=v;refreshSetNames();});});
+  [0,1,2,3].forEach(function(i){var sel=$('set'+i);LISTS.forEach(function(L,k){var o=el('option',null,'List '+(k+1)+': '+L.t);o.value=k;sel.appendChild(o);});sel._get=function(){return String(g().names[i]);};sel.addEventListener('change',function(){g().names[i]=parseInt(sel.value,10);save();render();$('set'+i).focus();});});
 
-  function setLabel(i){var n=g().names[i];return 'Set '+(i+1)+(n?': '+n:'');}
+  function setLabel(i){return 'Set '+(i+1)+': '+LISTS[g().names[i]].t;}
   function refreshSetNames(){var a=document.querySelectorAll('[data-setname]');for(var k=0;k<a.length;k++)a[k].textContent=setLabel(+a[k].getAttribute('data-setname'));}
   function refreshTotals(){
     var grp=g(),sum=0;shown().forEach(function(t,ti){var n=pts(t);sum+=n;var p=$('pts-'+ti);if(p){p.firstChild.textContent=n+' ';}});
     $('total').textContent=sum+' of '+(grp.count*grp.nsets)+' points earned';
   }
 
+  function nMissed(s){var n=0;for(var k in s.missed)if(s.missed[k])n++;return n;}
   function setBlock(t,ti,si){
-    var s=t.sets[si],box=el('div','set');
+    var s=t.sets[si];if(!s.missed)s.missed={};if(!s.ever)s.ever={};
+    var L=LISTS[g().names[si]],who='Table '+(ti+1)+', set '+(si+1);
+    var box=el('div','set');
     var top=el('div','set-top');var nm=el('span','set-name',setLabel(si));nm.setAttribute('data-setname',si);
     var st=el('span','status','');top.appendChild(nm);top.appendChild(st);box.appendChild(top);
     var gate=el('div','gate','');box.appendChild(gate);
+    var lrow=el('div','row lrow');var lst=el('span','lstat','');
+    var open=el('button','btn quiet','List');open.type='button';open.setAttribute('aria-expanded','false');open.setAttribute('aria-label',who+': open the structure list');
+    lrow.appendChild(open);lrow.appendChild(lst);box.appendChild(lrow);
+    var panel=el('div','lpanel');panel.hidden=true;panel.appendChild(el('p','lhint','Tick what they missed.'));
+    L.s.forEach(function(name,k){
+      var lab=el('label','miss'),cb=el('input');cb.type='checkbox';cb.checked=!!s.missed[k];
+      cb.addEventListener('change',function(){if(cb.checked){s.missed[k]=1;s.listPassed=false;}else delete s.missed[k];save();paint();});
+      lab.appendChild(cb);lab.appendChild(el('span',null,name));panel.appendChild(lab);
+    });
+    var chk=el('button','btn primary','Check list');chk.type='button';chk.setAttribute('aria-label',who+': check the list');
+    chk.addEventListener('click',function(){
+      s.listTries=(s.listTries||0)+1;
+      if(nMissed(s)===0){s.listPassed=true;panel.hidden=true;open.setAttribute('aria-expanded','false');}
+      else{s.listPassed=false;for(var k in s.missed)if(s.missed[k])s.ever[k]=1;}
+      save();paint();renderSummary();sendHeight();
+    });
+    panel.appendChild(chk);box.appendChild(panel);
+    open.addEventListener('click',function(){panel.hidden=!panel.hidden;open.setAttribute('aria-expanded',panel.hidden?'false':'true');sendHeight();});
     var row=el('div','row');
-    var lab=el('label','chk');var cb=el('input');cb.type='checkbox';cb.checked=s.lists;
-    cb.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': both lists shown');
-    cb.addEventListener('change',function(){s.lists=cb.checked;save();});
-    lab.appendChild(cb);lab.appendChild(document.createTextNode('Lists'));row.appendChild(lab);
     var misses=el('span','tries','');
     var need=el('button','btn maroon','');need.type='button';
     need.addEventListener('click',function(){s.needed=!s.needed;save();paint();refreshTotals();});
     var miss=el('button','btn quiet','Miss');miss.type='button';
-    miss.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': missed, try again');
+    miss.setAttribute('aria-label',who+': missed the table check, try again');
     miss.addEventListener('click',function(){s.tries++;save();paint();});
     var pass=el('button','btn primary','');pass.type='button';
     pass.addEventListener('click',function(){s.passed=!s.passed;save();paint();refreshTotals();renderGates();});
     function paint(){
-      var got=s.passed&&!s.needed;
+      var got=s.passed&&!s.needed,n=nMissed(s);
       box.className='set'+(got?' earned':'')+(s.needed?' needed':'');
       st.textContent=got?'Point':s.passed?'Passed, no point':s.needed?'Needed list':'Open';
+      lst.textContent=s.listPassed?'List passed'+(s.listTries>1?', try '+s.listTries:''):s.listTries?'List not yet, '+n+' missed':(n?n+' missed':'List not checked');
+      lst.className='lstat'+(s.listPassed?' ok':s.listTries?' no':'');
       need.textContent=s.needed?'Undo list':'Needed list';
       need.setAttribute('aria-pressed',s.needed?'true':'false');
-      need.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': needed the list from me, no point');
+      need.setAttribute('aria-label',who+': needed the list from me, no point');
       pass.textContent=s.passed?'Undo':'Pass';
       pass.setAttribute('aria-pressed',s.passed?'true':'false');
-      pass.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': passed the table check');
+      pass.setAttribute('aria-label',who+': passed the table check');
       miss.disabled=s.passed;misses.textContent='Misses '+s.tries;
     }
     box._gate=function(){gate.textContent=(si>0&&!t.sets[si-1].passed&&!s.passed)?'Pass set '+si+' first':'';};
     paint();box._gate();
     row.appendChild(need);row.appendChild(miss);row.appendChild(pass);row.appendChild(misses);box.appendChild(row);
     return box;
+  }
+  function renderSummary(){
+    var grp=g(),box=$('missed');box.textContent='';
+    for(var si=0;si<grp.nsets;si++){
+      var L=LISTS[grp.names[si]],rows=[];
+      L.s.forEach(function(name,k){var c=0;shown().forEach(function(t){var x=t.sets[si];if(x.ever&&x.ever[k])c++;});if(c)rows.push([c,name]);});
+      rows.sort(function(a,b){return b[0]-a[0];});
+      var d=el('div');d.appendChild(el('h3',null,setLabel(si)));
+      if(!rows.length)d.appendChild(el('p',null,'Nothing missed yet.'));
+      else{var ul=el('ul');rows.forEach(function(r){ul.appendChild(el('li',null,r[1]+' ('+r[0]+(r[0]===1?' table)':' tables)')));});d.appendChild(ul);}
+      box.appendChild(d);
+    }
   }
   function renderGates(){var a=document.querySelectorAll('.set');for(var k=0;k<a.length;k++)if(a[k]._gate)a[k]._gate();sendHeight();}
 
@@ -251,18 +327,6 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
     var p=el('div','pts');p.id='pts-'+ti;p.appendChild(document.createTextNode(pts(t)+' '));p.appendChild(el('small',null,'of '+NS()+' points'));
     head.appendChild(h);head.appendChild(p);c.appendChild(head);
     for(var si=0;si<NS();si++)c.appendChild(setBlock(t,ti,si));
-    var seat=el('div','seat');
-    var sl=el('label',null,'Seats');sl.setAttribute('for','seats-'+ti);sl.style.fontWeight='700';
-    var sn=el('input');sn.type='number';sn.min='2';sn.max='10';sn.id='seats-'+ti;sn.value=t.seats;
-    sn.addEventListener('input',function(){var v=parseInt(sn.value,10);if(v>=2&&v<=10){t.seats=v;save();}});
-    var out=el('output',null,t.seat?'Seat '+t.seat:'');out.setAttribute('aria-live','polite');out.setAttribute('for','seats-'+ti);
-    var pick=el('button','btn quiet','Pick');pick.type='button';pick.setAttribute('aria-label','Pick a random seat at table '+(ti+1));
-    pick.addEventListener('click',function(){var n=t.seats||4,r;do{r=1+Math.floor(Math.random()*n);}while(n>1&&r===t.seat);t.seat=r;out.textContent='Seat '+r;save();});
-    seat.appendChild(sl);seat.appendChild(sn);seat.appendChild(pick);seat.appendChild(out);c.appendChild(seat);
-    var nf=el('div','field note');var nl=el('label',null,'Reteach');nl.setAttribute('for','note-'+ti);
-    var ni=el('input');ni.type='text';ni.id='note-'+ti;ni.value=t.note;ni.autocomplete='off';
-    ni.addEventListener('input',function(){t.note=ni.value;save();});
-    nf.appendChild(nl);nf.appendChild(ni);c.appendChild(nf);
     return c;
   }
 
@@ -275,7 +339,7 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
     var grid=$('grid');grid.textContent='';
     $('ntables').value=String(grp.count);
     shown().forEach(function(t,ti){grid.appendChild(tableCard(t,ti));});
-    refreshTotals();$('confirm').className='confirm';$('out').hidden=true;$('msg').textContent='';
+    refreshTotals();renderSummary();$('confirm').className='confirm';$('out').hidden=true;$('msg').textContent='';
     sendHeight();
   }
 
@@ -284,9 +348,9 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
 
   function resultsText(){
     var grp=g(),L=['Lab check-off: '+GROUPS[state.active]+', '+(grp.date||'no date')+(grp.topic?', '+grp.topic:'')];
-    for(var i=0;i<grp.nsets;i++)if(grp.names[i])L.push('Set '+(i+1)+': '+grp.names[i]);
+    for(var i=0;i<grp.nsets;i++)L.push(setLabel(i));
     shown().forEach(function(t,ti){
-      var d=t.sets.slice(0,grp.nsets).map(function(s,si){return 'S'+(si+1)+' '+(s.passed&&!s.needed?'point earned':s.passed?'passed, no point (needed the list)':s.needed?'needed the list, not passed yet':'open')+' ('+s.tries+(s.tries===1?' miss':' misses')+')';}).join(', ');
+      var d=t.sets.slice(0,grp.nsets).map(function(s,si){var Ls=LISTS[grp.names[si]].s,ev=[];for(var k in (s.ever||{}))ev.push(Ls[k]);var lt=(s.listPassed?'list passed':'list not passed')+(s.listTries?' in '+s.listTries+(s.listTries===1?' try':' tries'):'')+(ev.length?', missed: '+ev.join('; '):'');return 'S'+(si+1)+' '+(s.passed&&!s.needed?'point earned':s.passed?'passed, no point (needed the list)':s.needed?'needed the list, not passed yet':'open')+' ('+s.tries+(s.tries===1?' check miss':' check misses')+', '+lt+')';}).join(', ');
       L.push('Table '+(ti+1)+': '+pts(t)+'/'+grp.nsets+' | '+d+(t.note?' | Reteach: '+t.note:''));
     });
     return L.join('\n');
@@ -299,6 +363,36 @@ input[type=text],input[type=date],input[type=number],select{min-height:32px;padd
   $('reset').addEventListener('click',function(){$('confirm').className='confirm open';$('yesReset').focus();sendHeight();});
   $('noReset').addEventListener('click',function(){$('confirm').className='confirm';$('reset').focus();sendHeight();});
   $('yesReset').addEventListener('click',function(){state.groups[state.active]=blankGroup();save();render();$('msg').textContent='This group was cleared.';$('reset').focus();});
+
+  // number wheel
+  var wG=$('wheelG'),wAngle=0,wBusy=false;
+  function drawWheel(){
+    var n=parseInt($('wheelN').value,10),NSV='http://www.w3.org/2000/svg',cols=['#060B1A','#7A2A22','#1E3D4C'];
+    while(wG.firstChild)wG.removeChild(wG.firstChild);
+    for(var i=0;i<n;i++){
+      var a0=(i/n)*2*Math.PI-Math.PI/2,a1=((i+1)/n)*2*Math.PI-Math.PI/2,am=(a0+a1)/2,R=100;
+      var pth=document.createElementNS(NSV,'path');
+      pth.setAttribute('d','M0 0 L'+(R*Math.cos(a0)).toFixed(2)+' '+(R*Math.sin(a0)).toFixed(2)+' A'+R+' '+R+' 0 0 1 '+(R*Math.cos(a1)).toFixed(2)+' '+(R*Math.sin(a1)).toFixed(2)+' Z');
+      var c=cols[i%2];if(n%2===1&&i===n-1)c=cols[2];
+      pth.setAttribute('fill',c);pth.setAttribute('stroke','#FAFAF9');pth.setAttribute('stroke-width','1.5');wG.appendChild(pth);
+      var tx=document.createElementNS(NSV,'text');tx.setAttribute('x',(66*Math.cos(am)).toFixed(2));tx.setAttribute('y',(66*Math.sin(am)).toFixed(2));
+      tx.setAttribute('fill','#FFFFFF');tx.setAttribute('font-size',n>7?'22':'28');tx.setAttribute('font-weight','800');tx.setAttribute('font-family','Plus Jakarta Sans, Arial, sans-serif');
+      tx.setAttribute('text-anchor','middle');tx.setAttribute('dominant-baseline','central');tx.textContent=String(i+1);wG.appendChild(tx);
+    }
+    wG.classList.remove('spinning');wAngle=0;wG.style.transform='rotate(0deg)';$('wheelRes').textContent='Count off, then spin.';
+  }
+  function spin(){
+    if(wBusy)return;var n=parseInt($('wheelN').value,10),r=Math.floor(Math.random()*n),seg=360/n;
+    var target=360-(r+0.5)*seg,cur=((wAngle%360)+360)%360,delta=((target-cur)%360+360)%360;
+    wAngle+=360*5+delta;wBusy=true;$('spin').disabled=true;$('wheelRes').textContent='Spinning';
+    var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    wG.classList.toggle('spinning',!still);wG.style.transform='rotate('+wAngle+'deg)';
+    setTimeout(function(){wBusy=false;$('spin').disabled=false;$('wheelRes').textContent='Number '+(r+1);},still?50:3300);
+  }
+  $('wheelN').addEventListener('change',drawWheel);
+  $('spin').addEventListener('click',spin);
+  $('wheelOpen').addEventListener('click',function(){drawWheel();var d=$('wheelDlg');if(d.showModal)d.showModal();else d.setAttribute('open','');$('spin').focus();});
+  $('wheelClose').addEventListener('click',function(){var d=$('wheelDlg');if(d.close)d.close();else d.removeAttribute('open');$('wheelOpen').focus();});
 
   function sendHeight(){try{window.parent.postMessage({id:'lab-checkoff',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
   window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);
