@@ -46,6 +46,22 @@ li.done label{background:var(--tint);border:2px solid var(--navy2)}
   li label{border:0;box-shadow:none;background:#fff !important;min-height:0;padding:3px 0}
   li.done label{border:0}li label::before,.count,.group{color:#000}
 }
+
+/* compact: all four lists side by side */
+header{padding:10px 16px}header .eyebrow{display:none}h1{font-size:22px;margin:0}
+.wrap{max-width:none}
+main{padding:10px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{font-size:16px}.how{font-size:12px;margin:2px 0 0}
+.top{margin:6px 0;gap:6px}.count{font-size:14px}
+.btn{min-height:28px;padding:3px 9px;font-size:10.5px;letter-spacing:.06em;border-radius:6px}
+li{margin-bottom:0}
+li label{min-height:28px;padding:3px 4px;gap:7px;border:0;border-radius:6px;box-shadow:none;font-size:14px;line-height:1.2}
+li label::before{min-width:1.5em;font-size:12px}
+li input{width:17px;height:17px}
+li.done label{border:0;background:var(--tint)}
+.group{font-size:10.5px;margin:8px 0 2px}
+@media print{main{display:block}.panel{border:0;box-shadow:none;padding:0}}
 </style>
 </head>
 <body>
@@ -54,7 +70,6 @@ li.done label{background:var(--tint);border:2px solid var(--navy2)}
   <div class="wrap">
     <p class="eyebrow">Renal lab</p>
     <h1>Renal Structure Checklists</h1>
-    <div class="tabs" role="tablist" aria-label="Structure list" id="tabs"></div>
   </div>
 </header>
 <main id="main" class="wrap" tabindex="-1"></main>
@@ -72,20 +87,15 @@ li.done label{background:var(--tint);border:2px solid var(--navy2)}
   try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);if(p&&p.done)state=p;}}catch(e){}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
-  var tabs=document.getElementById('tabs'),main=document.getElementById('main'),live=document.getElementById('live');
+  var main=document.getElementById('main'),live=document.getElementById('live');
 
   LISTS.forEach(function(L,li){
-    var b=el('button','tab',L.tab);b.type='button';b.id='tab-'+li;b.setAttribute('role','tab');b.setAttribute('aria-controls','panel-'+li);
-    b.addEventListener('click',function(){show(li);});
-    b.addEventListener('keydown',function(ev){var d=ev.key==='ArrowRight'?1:ev.key==='ArrowLeft'?-1:0;if(!d)return;ev.preventDefault();var n=(li+d+LISTS.length)%LISTS.length;show(n);document.getElementById('tab-'+n).focus();});
-    tabs.appendChild(b);
-
-    var panel=el('section','panel');panel.id='panel-'+li;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','tab-'+li);
-    panel.appendChild(el('h2',null,L.title));
+    var panel=el('section','panel');panel.id='panel-'+li;panel.setAttribute('aria-labelledby','h-'+li);
+    var hh=el('h2',null,L.title);hh.id='h-'+li;panel.appendChild(hh);
     if(L.how)panel.appendChild(el('p','how',L.how));
     var top=el('div','top'),count=el('div','count');top.appendChild(count);
-    var all=el('button','btn b-navy','Check all');all.type='button';
-    var clr=el('button','btn b-maroon','Clear list');clr.type='button';
+    var all=el('button','btn b-navy','All');all.type='button';all.setAttribute('aria-label','Check all in '+L.title);
+    var clr=el('button','btn b-maroon','Clear');clr.type='button';clr.setAttribute('aria-label','Clear '+L.title);
     top.appendChild(all);top.appendChild(clr);panel.appendChild(top);
     var boxes=[],total=0,k=0;
     L.groups.forEach(function(G){
@@ -101,21 +111,16 @@ li.done label{background:var(--tint);border:2px solid var(--navy2)}
       });
       panel.appendChild(ol);
     });
-    function upd(say){var n=boxes.filter(function(x){return x[0].checked;}).length;count.textContent=n+' of '+total+' checked';if(say)live.textContent=L.title+': '+n+' of '+total+' checked';send();}
+    function upd(say){var n=boxes.filter(function(x){return x[0].checked;}).length;count.textContent=n+' of '+total;if(say)live.textContent=L.title+': '+n+' of '+total+' checked';send();}
     function setAll(v){boxes.forEach(function(x){x[0].checked=v;x[1].className=v?'done':'';if(v)state.done[x[2]]=1;else delete state.done[x[2]];});save();upd(true);}
     all.addEventListener('click',function(){setAll(true);});clr.addEventListener('click',function(){setAll(false);});
     upd(false);main.appendChild(panel);
   });
 
-  function show(n){
-    state.active=n;save();
-    LISTS.forEach(function(_,li){var on=li===n,t=document.getElementById('tab-'+li);t.setAttribute('aria-selected',on?'true':'false');t.tabIndex=on?0:-1;document.getElementById('panel-'+li).style.display=on?'block':'none';});
-    send();
-  }
   function send(){try{window.parent.postMessage({id:'renal-checklists',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
   window.addEventListener('load',send);window.addEventListener('resize',send);
   if(window.ResizeObserver){new ResizeObserver(send).observe(document.body);}
-  show(state.active<LISTS.length?state.active:0);
+  send();
 })();
 </script>
 </body>

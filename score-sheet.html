@@ -36,6 +36,7 @@ input[type=text],input[type=date],input[type=number],select{font:inherit;width:1
 .btn{font:inherit;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:10px 16px;border-radius:8px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
 .btn.primary{background:var(--navy);color:#fff}
 .btn.quiet{border-color:#5A6478}
+.btn.maroon{background:var(--maroon);border-color:var(--maroon);color:#fff}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
 .total{margin-left:auto;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-weight:800;font-size:18px}
@@ -78,6 +79,28 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
 .fine{font-size:14px;color:var(--muted);margin-top:18px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:no-preference){.btn,.tab{transition:background-color .15s ease,color .15s ease}}
+
+/* compact one-screen layout */
+.hero{padding:10px 16px}.hero .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.hero .eyebrow,.hero p.sub{display:none}h1{font-size:22px;margin:0}
+.tabs{margin-top:0}.tab{min-height:34px;padding:6px 14px;font-size:12px}
+.wrap{max-width:none}main{padding:10px 14px}
+details.setup summary{min-height:32px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bar{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:4px 0 8px}
+input[type=text],input[type=date],input[type=number],select{min-height:32px;padding:4px 8px;font-size:14px}
+.field label{font-size:10px;margin-bottom:2px}
+.tools{margin:4px 0 8px}.total{font-size:15px}
+.grid{grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:8px;align-items:start}
+.card{padding:9px;border-radius:10px}.card-head{margin-bottom:6px}.card h2{font-size:16px}
+.pts{font-size:18px}.pts small{font-size:11px}
+.set{padding:6px;margin-bottom:6px;border-radius:8px}.set-top{margin-bottom:3px}
+.set-name{font-size:13px}.status{font-size:10px;letter-spacing:.06em}
+.row{gap:4px}.card .btn{min-height:30px;padding:4px 7px;font-size:10.5px;letter-spacing:.05em;border-radius:6px}
+.chk{min-height:30px;font-size:12px;gap:5px;padding:0 2px}.chk input{width:18px;height:18px}
+.tries{font-size:11px;margin-left:auto}
+.seat{gap:5px;margin-top:2px;font-size:12px}.seat input{width:50px}.seat output{font-size:14px;min-width:5ch}
+.note{margin-top:6px}.gate{font-size:11px;margin-bottom:3px}
+.panel{padding:12px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -93,6 +116,7 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
 
 <main id="main" class="wrap" tabindex="-1">
   <div id="panel" role="tabpanel" aria-labelledby="tab-0">
+    <details class="setup" id="setup" open><summary>Class setup</summary>
     <div class="bar">
       <div class="field"><label for="date">Date</label><input type="date" id="date"></div>
       <div class="field"><label for="ntables">Tables in this class</label><select id="ntables"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
@@ -103,6 +127,8 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
       <div class="field"><label for="set2">Set 3 covers</label><input type="text" id="set2" autocomplete="off"></div>
       <div class="field"><label for="set3">Set 4 covers</label><input type="text" id="set3" autocomplete="off"></div>
     </div>
+
+    </details>
 
     <div class="tools">
       <div class="total" id="total" aria-live="polite"></div>
@@ -189,12 +215,13 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
     var gate=el('div','gate','');box.appendChild(gate);
     var row=el('div','row');
     var lab=el('label','chk');var cb=el('input');cb.type='checkbox';cb.checked=s.lists;
+    cb.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': both lists shown');
     cb.addEventListener('change',function(){s.lists=cb.checked;save();});
-    lab.appendChild(cb);lab.appendChild(document.createTextNode('Both lists shown'));row.appendChild(lab);
+    lab.appendChild(cb);lab.appendChild(document.createTextNode('Lists'));row.appendChild(lab);
     var misses=el('span','tries','');
-    var need=el('button','btn quiet','');need.type='button';
+    var need=el('button','btn maroon','');need.type='button';
     need.addEventListener('click',function(){s.needed=!s.needed;save();paint();refreshTotals();});
-    var miss=el('button','btn quiet','Missed, try again');miss.type='button';
+    var miss=el('button','btn quiet','Miss');miss.type='button';
     miss.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': missed, try again');
     miss.addEventListener('click',function(){s.tries++;save();paint();});
     var pass=el('button','btn primary','');pass.type='button';
@@ -202,16 +229,16 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
     function paint(){
       var got=s.passed&&!s.needed;
       box.className='set'+(got?' earned':'')+(s.needed?' needed':'');
-      st.textContent=got?'Point earned':s.passed?'Passed, no point':s.needed?'Needed the list':'Open';
-      need.textContent=s.needed?'Undo needed the list':'Needed the list';
+      st.textContent=got?'Point':s.passed?'Passed, no point':s.needed?'Needed list':'Open';
+      need.textContent=s.needed?'Undo list':'Needed list';
       need.setAttribute('aria-pressed',s.needed?'true':'false');
       need.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': needed the list from me, no point');
-      pass.textContent=s.passed?'Undo check':(s.needed?'Passed check':'Passed, give point');
+      pass.textContent=s.passed?'Undo':'Pass';
       pass.setAttribute('aria-pressed',s.passed?'true':'false');
       pass.setAttribute('aria-label','Table '+(ti+1)+', set '+(si+1)+': passed the table check');
-      miss.disabled=s.passed;misses.textContent='Misses: '+s.tries;
+      miss.disabled=s.passed;misses.textContent='Misses '+s.tries;
     }
-    box._gate=function(){gate.textContent=(si>0&&!t.sets[si-1].passed&&!s.passed)?'Set '+si+' is not passed yet. Check that one first.':'';};
+    box._gate=function(){gate.textContent=(si>0&&!t.sets[si-1].passed&&!s.passed)?'Pass set '+si+' first':'';};
     paint();box._gate();
     row.appendChild(need);row.appendChild(miss);row.appendChild(pass);row.appendChild(misses);box.appendChild(row);
     return box;
@@ -229,10 +256,10 @@ textarea{font:inherit;width:100%;min-height:150px;padding:10px;border:1px solid 
     var sn=el('input');sn.type='number';sn.min='2';sn.max='10';sn.id='seats-'+ti;sn.value=t.seats;
     sn.addEventListener('input',function(){var v=parseInt(sn.value,10);if(v>=2&&v<=10){t.seats=v;save();}});
     var out=el('output',null,t.seat?'Seat '+t.seat:'');out.setAttribute('aria-live','polite');out.setAttribute('for','seats-'+ti);
-    var pick=el('button','btn quiet','Pick a seat');pick.type='button';pick.setAttribute('aria-label','Pick a random seat at table '+(ti+1));
+    var pick=el('button','btn quiet','Pick');pick.type='button';pick.setAttribute('aria-label','Pick a random seat at table '+(ti+1));
     pick.addEventListener('click',function(){var n=t.seats||4,r;do{r=1+Math.floor(Math.random()*n);}while(n>1&&r===t.seat);t.seat=r;out.textContent='Seat '+r;save();});
     seat.appendChild(sl);seat.appendChild(sn);seat.appendChild(pick);seat.appendChild(out);c.appendChild(seat);
-    var nf=el('div','field note');var nl=el('label',null,'Structures to reteach');nl.setAttribute('for','note-'+ti);
+    var nf=el('div','field note');var nl=el('label',null,'Reteach');nl.setAttribute('for','note-'+ti);
     var ni=el('input');ni.type='text';ni.id='note-'+ti;ni.value=t.note;ni.autocomplete='off';
     ni.addEventListener('input',function(){t.note=ni.value;save();});
     nf.appendChild(nl);nf.appendChild(ni);c.appendChild(nf);
