@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Renal Structure Checklists</title>
+<title>Module 5 Structure Checklists</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
 <style>
@@ -62,14 +62,19 @@ li input{width:17px;height:17px}
 li.done label{border:0;background:var(--tint)}
 .group{font-size:10.5px;margin:8px 0 2px}
 @media print{main{display:block}.panel{border:0;box-shadow:none;padding:0}}
+header .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.pick{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.pick select{font:inherit;min-height:34px;padding:4px 8px;border-radius:8px;border:1px solid #8A93A8;background:#fff;color:var(--navy)}
+@media print{.pick{display:none}}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the checklist</a>
 <header>
   <div class="wrap">
-    <p class="eyebrow">Renal lab</p>
-    <h1>Renal Structure Checklists</h1>
+    <p class="eyebrow">BIO 004 lab</p>
+    <h1>Module 5 Structure Checklists</h1>
+    <div class="pick"><label for="topic">Topic</label><select id="topic"></select></div>
   </div>
 </header>
 <main id="main" class="wrap" tabindex="-1"></main>
@@ -77,50 +82,45 @@ li.done label{border:0;background:var(--tint)}
 
 <script>
 (function(){
-  var LISTS=[
-    {tab:'1 Blood flow',title:'List 1: Blood flow',how:'Name these in blood flow order.',groups:[[null,['Renal artery','Segmental artery','Interlobar artery','Arcuate artery','Cortical radiate artery','Afferent arteriole','Glomerulus','Efferent arteriole','Peritubular capillaries','Vasa recta','Cortical radiate vein','Arcuate vein','Interlobar vein','Renal vein']]]},
-    {tab:'2 Nephron',title:'List 2: Nephron',how:'Name these in the order fluid moves through the nephron.',groups:[[null,['Glomerulus','Glomerular (Bowman’s) capsule, visceral layer (podocytes)','Capsular space','Glomerular (Bowman’s) capsule, parietal layer','Proximal convoluted tubule','Nephron loop (loop of Henle), descending limb','Hairpin turn of the nephron loop','Nephron loop (loop of Henle), ascending limb','Distal convoluted tubule','Collecting duct']]]},
-    {tab:'3 Kidney',title:'List 3: Kidney, outside to ureter',how:'Name these from the outside of the kidney inward, then follow the path urine takes out.',groups:[[null,['Renal capsule','Renal hilum','Renal cortex','Renal medulla','Renal pyramid','Renal column','Renal papilla','Renal sinus','Minor calyx','Major calyx','Renal pelvis','Ureter']]]},
-    {tab:'4 Glomerulus and bladder',title:'List 4: Glomerulus model and bladder plaque',how:'',groups:[['Glomerulus model',['Afferent arteriole','Glomerular capillaries','Efferent arteriole','Podocytes (visceral layer)','Capsular space','Parietal layer of the glomerular capsule','Macula densa','Juxtaglomerular (granular) cells']],['Bladder plaque',['Ureter','Ureteral orifices','Trigone','Detrusor muscle','Rugae','Internal urethral orifice','Urethra']]]}
-  ];
-  var KEY='renal-checklists-v1',state={active:0,done:{}};
+  var TOPICS=[{"topic": "Urinary", "lists": [{"id": "u1", "t": "Renal blood flow", "s": ["Renal artery", "Segmental artery", "Interlobar artery", "Arcuate artery", "Cortical radiate artery", "Afferent arteriole", "Glomerulus", "Efferent arteriole", "Peritubular capillaries", "Vasa recta", "Cortical radiate vein", "Arcuate vein", "Interlobar vein", "Renal vein"]}, {"id": "u2", "t": "Nephron", "s": ["Glomerulus", "Glomerular (Bowman’s) capsule, visceral layer (podocytes)", "Capsular space", "Glomerular (Bowman’s) capsule, parietal layer", "Proximal convoluted tubule", "Loop of Henle, descending limb", "Hairpin turn of the loop", "Loop of Henle, ascending limb", "Distal convoluted tubule", "Collecting duct", "Papillary duct"]}, {"id": "u3", "t": "Kidney, outside to ureter", "s": ["Renal capsule", "Renal hilum", "Renal cortex", "Renal medulla", "Renal pyramid", "Renal column", "Renal papilla", "Renal sinus", "Minor calyx", "Major calyx", "Renal pelvis", "Ureter"]}, {"id": "u4", "t": "Renal corpuscle model and bladder", "s": ["Afferent arteriole", "Glomerulus", "Efferent arteriole", "Parietal layer of the glomerular capsule", "Visceral layer of the glomerular capsule (podocytes)", "Capsular space", "Juxtaglomerular apparatus", "Macula densa cells", "Granular (juxtaglomerular) cells", "Ureter", "Urinary bladder", "Ureteral openings", "Trigone", "Detrusor muscle", "Internal urethral orifice", "Internal urethral sphincter", "External urethral sphincter", "Urethra"]}, {"id": "u5", "t": "Urinary system, gross", "s": ["Right kidney", "Left kidney", "Suprarenal (adrenal) gland", "Ureter", "Urinary bladder", "Male urethra", "Female urethra"]}]}, {"topic": "Male reproductive", "lists": [{"id": "m1", "t": "Scrotum, testis and spermatic cord", "s": ["Scrotum", "Dartos muscle", "Cremaster muscle", "Spermatic cord", "Inguinal canal", "Testicular artery", "Testicular vein", "Pampiniform plexus", "Testis", "Tunica vaginalis", "Tunica albuginea", "Seminiferous tubules"]}, {"id": "m2", "t": "Ducts, glands and penis", "s": ["Epididymis", "Vas deferens (ductus deferens)", "Seminal vesicles", "Ejaculatory duct", "Prostate gland", "Prostatic urethra", "Membranous urethra", "Bulbourethral glands", "Spongy (penile) urethra", "Corpus spongiosum", "Corpora cavernosa", "Glans penis", "Prepuce"]}, {"id": "m3", "t": "Testis tissue and sperm cell (slides)", "s": ["Seminiferous tubule", "Sustentacular (Sertoli) cells", "Interstitial (Leydig) cells", "Developing sperm cells", "Head", "Acrosome", "Neck", "Middle piece", "Principal piece", "End piece"]}]}, {"topic": "Female reproductive", "lists": [{"id": "f1", "t": "Ovary, ligaments and uterine tube", "s": ["Ovary", "Ovarian ligament", "Suspensory ligament", "Broad ligament of the uterus", "Round ligament of the uterus", "Ovarian artery", "Ovarian vein", "Fimbriae", "Infundibulum", "Ampulla", "Isthmus"]}, {"id": "f2", "t": "Uterus and vagina", "s": ["Fundus", "Body", "Cervix", "Uterine cavity", "Cervical canal", "Perimetrium", "Myometrium", "Endometrium", "Fornix", "Vagina", "Vaginal orifice"]}, {"id": "f3", "t": "Vulva and pelvic vessels", "s": ["Mons pubis", "Labia majora", "Labia minora", "Clitoris", "Urethral orifice", "Vestibule", "Perineum", "Internal iliac artery", "External iliac artery", "Internal iliac vein", "External iliac vein", "Medial umbilical ligament"]}, {"id": "f4", "t": "Ovary tissue (slide)", "s": ["Ovarian cortex", "Ovarian medulla", "Ovarian follicles", "Mature follicle", "Corpus luteum", "Corpus albicans"]}]}, {"topic": "Brain", "lists": [{"id": "b1", "t": "Cerebrum surface and lobes", "s": ["Gyrus", "Sulcus", "Longitudinal fissure", "Transverse fissure", "Lateral sulcus (Sylvian fissure)", "Central sulcus", "Precentral gyrus", "Precentral sulcus", "Postcentral gyrus", "Postcentral sulcus", "Frontal lobe", "Parietal lobe", "Temporal lobe", "Occipital lobe", "Insula"]}, {"id": "b2", "t": "Midsagittal section", "s": ["Corpus callosum", "Sulcus of the corpus callosum", "Cingulate gyrus", "Cingulate sulcus", "Septum pellucidum", "Fornix", "Thalamus", "Massa intermedia (interthalamic adhesion)", "Hypothalamus", "Infundibulum", "Pineal gland", "Optic chiasm", "Cerebellum", "Transverse fissure"]}, {"id": "b3", "t": "Inferior surface and functional areas", "s": ["Uncus", "Parahippocampal gyrus", "Mammillary bodies", "Crus cerebri", "Optic chiasm", "Optic nerve", "Optic tract", "Olfactory bulb", "Olfactory tract", "Primary motor cortex", "Primary sensory cortex", "Broca’s area", "Wernicke’s area"]}, {"id": "b4", "t": "Cerebral arterial circle (Circle of Willis)", "s": ["Vertebral arteries", "Anterior spinal artery", "Posterior inferior cerebellar artery", "Basilar artery", "Anterior inferior cerebellar artery", "Pontine arteries", "Superior cerebellar artery", "Posterior cerebral artery", "Posterior communicating artery", "Internal carotid artery", "Middle cerebral artery", "Anterior cerebral artery", "Anterior communicating artery"]}]}, {"topic": "Brainstem and cerebellum", "lists": [{"id": "s1", "t": "Brainstem", "s": ["Midbrain", "Cerebral peduncles", "Crus cerebri", "Cerebral aqueduct", "Corpora quadrigemina", "Superior colliculi", "Inferior colliculi", "Pons", "Basilar pons", "Fourth ventricle", "Pontomedullary junction", "Medulla oblongata", "Pyramids", "Decussation of the pyramids", "Medullary olive"]}, {"id": "s2", "t": "Cerebellum and peduncles", "s": ["Cerebellum", "Cerebellar hemispheres", "Vermis", "Folia", "Cerebellar cortex", "Arbor vitae", "Superior cerebellar peduncle", "Middle cerebellar peduncle", "Inferior cerebellar peduncle"]}]}, {"topic": "Meninges, ventricles and CSF", "lists": [{"id": "g1", "t": "Meninges, dural extensions and sinuses", "s": ["Dura mater", "Periosteal layer of the dura", "Meningeal layer of the dura", "Arachnoid mater", "Pia mater", "Falx cerebri", "Falx cerebelli", "Tentorium cerebelli", "Superior sagittal sinus", "Inferior sagittal sinus", "Straight sinus", "Confluence of sinuses", "Transverse sinus", "Sigmoid sinus"]}, {"id": "g2", "t": "Spaces, ventricles and choroid plexus", "s": ["Epidural space", "Subdural space", "Subarachnoid space", "Arachnoid granulations", "Lateral ventricle", "Septum pellucidum", "Interventricular foramen of Monro", "Third ventricle", "Cerebral aqueduct", "Fourth ventricle", "Central canal", "Choroid plexus", "Ependymal cells"]}]}, {"topic": "Spinal cord", "lists": [{"id": "c1", "t": "Spinal meninges and external cord", "s": ["Dura mater", "Arachnoid mater", "Pia mater", "Epidural space", "Subdural space", "Subarachnoid space", "Denticulate ligaments", "Cervical enlargement", "Lumbar enlargement", "Conus medullaris", "Cauda equina", "Filum terminale", "Anterior median fissure", "Posterior median sulcus"]}, {"id": "c2", "t": "Cord in cross section", "s": ["Gray matter", "White matter", "Ventral (anterior) horn", "Lateral horn", "Dorsal (posterior) horn", "Gray commissure", "Central canal", "Anterior white commissure", "Anterior column", "Lateral column", "Posterior column"]}]}, {"topic": "Peripheral nerves and plexuses", "lists": [{"id": "p1", "t": "Spinal nerve, rami and plexuses", "s": ["Ventral (anterior) root", "Dorsal (posterior) root", "Dorsal root ganglion", "Spinal nerve", "Intervertebral foramen", "Ventral (anterior) ramus", "Dorsal (posterior) ramus", "White ramus communicans", "Gray ramus communicans", "Sympathetic chain ganglion", "Sympathetic trunk", "Cervical plexus", "Brachial plexus", "Lumbar plexus", "Sacral plexus", "Phrenic nerve"]}]}, {"topic": "Cranial nerves", "lists": [{"id": "n1", "t": "The twelve cranial nerves", "s": ["CN I, Olfactory", "CN II, Optic", "CN III, Oculomotor", "CN IV, Trochlear", "CN V, Trigeminal", "CN VI, Abducens", "CN VII, Facial", "CN VIII, Vestibulocochlear", "CN IX, Glossopharyngeal", "CN X, Vagus", "CN XI, Accessory", "CN XII, Hypoglossal"]}, {"id": "n2", "t": "Associated structures and eye muscles", "s": ["Olfactory bulb", "Olfactory tract", "Olfactory foramina in the cribriform plate", "Optic nerve", "Optic chiasm", "Optic tract", "Optic canal", "Superior orbital fissure", "Internal acoustic meatus", "Pontomedullary junction", "Lateral rectus", "Medial rectus", "Superior rectus", "Inferior rectus", "Superior oblique", "Inferior oblique"]}]}, {"topic": "Nervous tissue, histology", "lists": [{"id": "h1", "t": "Neuron and neuroglia", "s": ["Cell body (soma)", "Nucleus", "Nucleolus", "Nissl bodies", "Neurofibrils", "Cell processes (dendrites)", "Axon hillock", "Axon", "Synaptic bulb (terminal end)", "Astrocytes", "Oligodendrocytes", "Microglia", "Ependymal cells", "Schwann cells", "Satellite cells"]}, {"id": "h2", "t": "Cortex, cerebellum and nerve (slides)", "s": ["Pyramidal cells", "Gray matter of the cortex", "Underlying white matter", "Purkinje cells", "Cerebellar cortex", "Arbor vitae", "Axon", "Schwann cells", "Nodes of Ranvier", "Endoneurium", "Perineurium", "Fascicle", "Epineurium"]}]}];
+  var KEY='m5-checklists-v1',state={topic:0,done:{}};
   try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);if(p&&p.done)state=p;}}catch(e){}
+  if(!TOPICS[state.topic])state.topic=0;
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
-  var main=document.getElementById('main'),live=document.getElementById('live');
-
-  LISTS.forEach(function(L,li){
-    var panel=el('section','panel');panel.id='panel-'+li;panel.setAttribute('aria-labelledby','h-'+li);
-    var hh=el('h2',null,L.title);hh.id='h-'+li;panel.appendChild(hh);
-    if(L.how)panel.appendChild(el('p','how',L.how));
-    var top=el('div','top'),count=el('div','count');top.appendChild(count);
-    var all=el('button','btn b-navy','All');all.type='button';all.setAttribute('aria-label','Check all in '+L.title);
-    var clr=el('button','btn b-maroon','Clear');clr.type='button';clr.setAttribute('aria-label','Clear '+L.title);
-    top.appendChild(all);top.appendChild(clr);panel.appendChild(top);
-    var boxes=[],total=0,k=0;
-    L.groups.forEach(function(G){
-      if(G[0])panel.appendChild(el('p','group',G[0]));
-      var ol=el('ol');if(k)ol.style.counterReset='n '+k;
-      G[1].forEach(function(name){
-        var id='c'+li+'-'+k,item=el('li'),lab=el('label'),cb=el('input');
+  var main=document.getElementById('main'),live=document.getElementById('live'),pick=document.getElementById('topic');
+  TOPICS.forEach(function(T,i){var o=el('option',null,T.topic);o.value=i;pick.appendChild(o);});
+  pick.value=String(state.topic);
+  pick.addEventListener('change',function(){state.topic=parseInt(pick.value,10);save();render();});
+  function render(){
+    main.textContent='';
+    TOPICS[state.topic].lists.forEach(function(L,li){
+      var panel=el('section','panel');panel.setAttribute('aria-labelledby','h-'+li);
+      var hh=el('h2',null,'List '+(li+1)+': '+L.t);hh.id='h-'+li;panel.appendChild(hh);
+      var top=el('div','top'),count=el('div','count');top.appendChild(count);
+      var all=el('button','btn b-navy','All');all.type='button';all.setAttribute('aria-label','Check all in '+L.t);
+      var clr=el('button','btn b-maroon','Clear');clr.type='button';clr.setAttribute('aria-label','Clear '+L.t);
+      top.appendChild(all);top.appendChild(clr);panel.appendChild(top);
+      var boxes=[],ol=el('ol');
+      L.s.forEach(function(name,k){
+        var id=L.id+'-'+k,item=el('li'),lab=el('label'),cb=el('input');
         cb.type='checkbox';cb.id=id;cb.checked=!!state.done[id];lab.setAttribute('for',id);
         if(cb.checked)item.className='done';
         cb.addEventListener('change',function(){if(cb.checked)state.done[id]=1;else delete state.done[id];item.className=cb.checked?'done':'';save();upd(true);});
-        lab.appendChild(cb);lab.appendChild(el('span',null,name));item.appendChild(lab);ol.appendChild(item);
-        boxes.push([cb,item,id]);k++;total++;
+        lab.appendChild(cb);lab.appendChild(el('span',null,name));item.appendChild(lab);ol.appendChild(item);boxes.push([cb,item,id]);
       });
       panel.appendChild(ol);
+      function upd(say){var n=boxes.filter(function(x){return x[0].checked;}).length;count.textContent=n+' of '+boxes.length;if(say)live.textContent=L.t+': '+n+' of '+boxes.length+' checked';send();}
+      function setAll(v){boxes.forEach(function(x){x[0].checked=v;x[1].className=v?'done':'';if(v)state.done[x[2]]=1;else delete state.done[x[2]];});save();upd(true);}
+      all.addEventListener('click',function(){setAll(true);});clr.addEventListener('click',function(){setAll(false);});
+      upd(false);main.appendChild(panel);
     });
-    function upd(say){var n=boxes.filter(function(x){return x[0].checked;}).length;count.textContent=n+' of '+total;if(say)live.textContent=L.title+': '+n+' of '+total+' checked';send();}
-    function setAll(v){boxes.forEach(function(x){x[0].checked=v;x[1].className=v?'done':'';if(v)state.done[x[2]]=1;else delete state.done[x[2]];});save();upd(true);}
-    all.addEventListener('click',function(){setAll(true);});clr.addEventListener('click',function(){setAll(false);});
-    upd(false);main.appendChild(panel);
-  });
-
-  function send(){try{window.parent.postMessage({id:'renal-checklists',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
+    send();
+  }
+  function send(){try{window.parent.postMessage({id:'m5-checklists',type:'resize',height:document.documentElement.scrollHeight},'*');}catch(e){}}
   window.addEventListener('load',send);window.addEventListener('resize',send);
   if(window.ResizeObserver){new ResizeObserver(send).observe(document.body);}
-  send();
+  render();
 })();
 </script>
 </body>
